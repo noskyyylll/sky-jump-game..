@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#087e91"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest"><title>Тропический рай</title>
+<style>
+:root{--ink:#153b45;--muted:#66818a;--aqua:#08a6a6;--deep:#075b68;--gold:#ffd36e;--glass:rgba(8,38,48,.78)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#087e91;font-family:Inter,system-ui,-apple-system,sans-serif;touch-action:none;color:var(--ink)}
+#game{position:absolute;inset:0;width:100%;height:100%;display:block}
+.top{position:absolute;top:env(safe-area-inset-top,0px);left:10px;right:10px;display:flex;gap:7px;align-items:center;justify-content:space-between;padding:9px;border:1px solid #ffffff65;border-radius:20px;background:linear-gradient(135deg,#ffffffeb,#e6ffffd9);box-shadow:0 10px 28px #063f4d55;backdrop-filter:blur(16px);z-index:3;font-weight:850;font-size:clamp(10px,2.7vw,14px)}
+.stat{background:#ffffffc9;border:1px solid #d7f1ec;border-radius:14px;padding:8px 9px;white-space:nowrap;box-shadow:0 2px 8px #155c6020}.stat b{color:#078b76}.top button,.pill{border:0;border-radius:13px;padding:9px 12px;background:linear-gradient(135deg,#087e91,#08a6a6);color:white;font-weight:900;box-shadow:0 4px 0 #075866}
+.quest{position:absolute;top:calc(env(safe-area-inset-top,0px) + 67px);left:10px;right:10px;z-index:2;border-radius:17px;padding:9px 12px;background:linear-gradient(110deg,#083f50eF,#087e91eF);border:1px solid #ffffff70;color:white;font-size:12px;font-weight:850;display:flex;align-items:center;justify-content:space-between;box-shadow:0 8px 20px #064a5550;backdrop-filter:blur(12px)}
+.quest span:last-child{background:#ffffff20;padding:5px 9px;border-radius:10px;color:#ffe18a}
+.bottom{position:absolute;left:9px;right:9px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);z-index:4;border:1px solid #ffffff75;border-radius:23px;background:linear-gradient(145deg,#faffffed,#dff8f3ed);box-shadow:0 12px 30px #063f4d55;padding:8px;backdrop-filter:blur(18px)}
+.tabs{display:flex;gap:5px;overflow:auto;scrollbar-width:none}.tabs button{flex:1;min-width:0;border:0;border-radius:12px;background:#e3f3ef;padding:9px 4px;font-size:11px;font-weight:900;color:#42636a}.tabs button.active{background:linear-gradient(135deg,#087e91,#08aaa2);color:white;box-shadow:0 4px 10px #087e9145}
+.items{display:flex;gap:8px;overflow-x:auto;padding:9px 2px 4px;scrollbar-width:none}.item{flex:0 0 74px;height:72px;border:1px solid #c7e5df;border-radius:16px;background:linear-gradient(155deg,#fff,#eaf9f4);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px;position:relative;box-shadow:0 3px 8px #245d5c15}.item small{font-size:9px;font-weight:900;color:#42636a}.item.sel{outline:3px solid #08a6a6;transform:translateY(-2px)}.item em{position:absolute;right:4px;top:3px;font-size:9px;font-style:normal;background:#fff1c7;border-radius:7px;padding:2px 4px;color:#79531c}
+.hint{font-size:10px;text-align:center;color:#50747a;font-weight:800;padding:4px}
+.overlay{position:absolute;inset:0;background:#052f3bbd;z-index:10;display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(7px)}.panel{width:min(460px,100%);max-height:82vh;overflow:auto;background:linear-gradient(150deg,#faffff,#dff5ef);border:1px solid #ffffff;border-radius:25px;padding:19px;box-shadow:0 18px 55px #001c2c80}.panel h2{margin:0 0 10px;font-size:23px;color:#124a54}.panel p{font-size:13px;line-height:1.5;color:#45666d}.panel button{border:0;border-radius:13px;padding:11px 14px;background:linear-gradient(135deg,#087e91,#08aaa2);color:white;font-weight:900;margin:4px;box-shadow:0 3px 0 #075866}.close{float:right;background:#d65d51!important;box-shadow:none!important}.shoprow{display:flex;align-items:center;justify-content:space-between;padding:9px;border-bottom:1px solid #cfe7df;font-weight:800}.toast{position:absolute;z-index:8;left:50%;top:29%;transform:translate(-50%,-50%);background:#faffff;border:1px solid #b8e3d9;border-radius:16px;padding:11px 16px;font-weight:900;box-shadow:0 8px 25px #063f4d55;opacity:0;pointer-events:none;transition:opacity .2s;text-align:center;max-width:85%;color:#12545d}.toast.show{opacity:1}
+@media(min-width:700px){.bottom{left:50%;transform:translateX(-50%);width:min(700px,95%)}.top{left:50%;transform:translateX(-50%);width:min(700px,95%)}.quest{left:50%;transform:translateX(-50%);width:min(680px,92%)}}
+</style></head><body>
+<canvas id="game"></canvas>
+<div class="top">
+ <div class="stat">🪙 <b id="coins">1200</b></div><div class="stat">🏖️ <b id="guests">12</b></div><div class="stat">✦ Ур. <b id="level">1</b></div><button id="menuBtn">☰</button>
+</div>
+<div class="quest"><span id="questTitle">🎯 ЗАДАНИЕ 1 · Создай уютный берег</span><span id="questCount">0 / 3</span></div>
+<div class="toast" id="toast"></div>
+<div class="bottom">
+ <div class="tabs" id="tabs"><button class="active" data-cat="build">🏨 Постройки</button><button data-cat="nature">🌴 Растения</button><button data-cat="fun">🛟 Развлечения</button><button data-cat="decor">✨ Декор</button></div>
+ <div class="items" id="items"></div><div class="hint" id="hint">Выбери объект, затем коснись свободного места на острове</div>
+</div>
+<div class="overlay" id="overlay"><div class="panel" id="panel"></div></div>
+<script>
+(()=>{
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+let W=0,H=0,dpr=1,coins=1200,guests=12,level=1,placed=[],selected=null,cat='build',tick=0,camX=0,camY=0,scale=1,drag=null,toastTimer,questStage=0,upgrades=0;
+const quests=[
+ {title:'🎯 ЗАДАНИЕ 1 · Создай уютный берег',desc:'Поставь 3 любых объекта на острове.',goal:3,check:()=>placed.length,reward:250},
+ {title:'🌴 ЗАДАНИЕ 2 · Добавь тропики',desc:'Посади 2 пальмы или растения.',goal:2,check:()=>placed.filter(o=>['🌴','🌺','🌿','🌳'].includes(o.icon)).length,reward:350},
+ {title:'🏡 ЗАДАНИЕ 3 · Приюти гостей',desc:'Построй 2 здания для отдыха.',goal:2,check:()=>placed.filter(o=>['🏡','🏨','🍹','🍦'].includes(o.icon)).length,reward:500},
+ {title:'✨ ЗАДАНИЕ 4 · Курорт мечты',desc:'Улучши любой объект 2 раза.',goal:2,check:()=>upgrades,reward:700},
+ {title:'🌊 ЗАДАНИЕ 5 · Большое открытие',desc:'Построй ещё 5 объектов.',goal:5,check:()=>Math.max(0,placed.length-7),reward:1000}
+];
+const items={
+ build:[['🏖️','Шезлонг',90,1],['🍹','Пляжный бар',260,2],['🏡','Бунгало',420,3],['🍦','Кафе-мороженое',350,3],['🏨','Мини-отель',750,5]],
+ nature:[['🌴','Пальма',70,1],['🌺','Цветы',35,1],['🌳','Тропическое дерево',110,1],['🌿','Живая изгородь',55,1]],
+ fun:[['🛝','Водная горка',520,4],['🛶','Прокат лодок',390,3],['🏊','Бассейн',650,5],['🏄','Сёрф-станция',310,2]],
+ decor:[['⛲','Фонтан',280,2],['🗿','Статуя',190,1],['🪧','Указатель',65,1],['🎡','Мини-аттракцион',850,6]]
+};
+const colors=['#e8b96c','#f0d28d','#d6a65f','#b9d9ce'];
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',resize);resize();
+function iso(x,y){return {x:W/2+(x-y)*31*scale+camX,y:H*.52+(x+y)*16*scale+camY}}
+function polygon(points,fill,stroke){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}
+function ellipse(x,y,rx,ry,c){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=c;ctx.fill()}
+function line(a,b,c,w=2){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=c;ctx.lineWidth=w;ctx.stroke()}
+function draw(){
+ tick+=.016;ctx.clearRect(0,0,W,H);
+ let sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#70d5e5');sky.addColorStop(.55,'#2db8c5');sky.addColorStop(1,'#087b91');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+ let sun=ctx.createRadialGradient(W*.78,H*.19,2,W*.78,H*.19,Math.min(W,H)*.30);sun.addColorStop(0,'#fff8c766');sun.addColorStop(1,'#fff8c700');ctx.fillStyle=sun;ctx.fillRect(0,0,W,H);
+ // sparkling sea
+ for(let i=0;i<75;i++){let x=(i*97+tick*18)%W,y=(i*53+tick*11)%(H*.82);ctx.globalAlpha=.12+.12*Math.sin(tick*2+i);line({x,y},{x:x+8,y:y-2},'#e5ffff',1); }ctx.globalAlpha=1;
+ // island isometric grid
+ for(let y=-2;y<13;y++)for(let x=-5;x<6;x++){
+  let p=iso(x,y);let sand=(x+y> -2 && x+y<12 && x-y<9 && y-x<10);
+  if(!sand)continue;
+  let c=((x+y)%3===0)?'#f2d59a':'#e9c783';
+  polygon([{x:p.x,y:p.y},{x:p.x+31*scale,y:p.y+16*scale},{x:p.x,y:p.y+32*scale},{x:p.x-31*scale,y:p.y+16*scale}],c,'#d5b374');
+ }
+ // water channel diagonally
+ ctx.save();ctx.globalAlpha=.88;polygon([{x:0,y:H*.30},{x:W*.25,y:H*.30},{x:W*.83,y:H*.76},{x:W*.70,y:H*.86},{x:W*.10,y:H*.48},{x:0,y:H*.48}],'#159eb3','#9de8e6');ctx.restore();
+ for(let i=0;i<10;i++){let x=(i*83+tick*15)%W,y=H*.36+i*H*.043;line({x,y},{x:x+22,y:y+8},'#9de8e6',2)}
+ // palm silhouettes at edge
+ for(let i=0;i<8;i++){let p=iso(-4+i,1+(i%3)*3);drawPalm(p.x,p.y,0.72)}
+ // built objects
+ for(const o of placed){let p=iso(o.x,o.y);drawObject(p.x,p.y,o)}
+ // visitors wander
+ for(let i=0;i<Math.min(guests,24);i++){let x=((i*47+tick*4)%260)-130,y=((i*19)%130)-45,p=iso(x/31,y/16);ellipse(p.x,p.y+3,3.3,2,'#93633e');ellipse(p.x,p.y-4,3.4,4,['#e75b49','#f7c84c','#315e9c','#f5f0d9'][i%4]);}
+ // dock + boats
+ let dock=iso(3,1);polygon([{x:dock.x-18,y:dock.y-5},{x:dock.x+25,y:dock.y+17},{x:dock.x+17,y:dock.y+26},{x:dock.x-26,y:dock.y+4}],'#98623a','#6b452a');
+ for(let i=0;i<3;i++){let bx=(dock.x+30+i*27+Math.sin(tick+i)*5),by=dock.y+25+i*8;ellipse(bx,by,12,5,'#f6f1dd');polygon([{x:bx-10,y:by},{x:bx+10,y:by},{x:bx+5,y:by+6},{x:bx-5,y:by+6}],'#ef794b');}
+ // selected placement preview
+ if(selected&&pointer.active){let g=screenToGrid(pointer.x,pointer.y),p=iso(g.x,g.y);ellipse(p.x,p.y+8,19,8,'#0b657755');drawObject(p.x,p.y,{icon:selected[0],name:selected[1],ghost:true})}
+ requestAnimationFrame(draw)
+}
+function drawPalm(x,y,s=1){ctx.save();ctx.translate(x,y);ctx.scale(s,s);line({x:0,y:0},{x:2,y:-30},'#8a5934',5);for(let i=0;i<6;i++){let a=-2.9+i*.62;line({x:2,y:-29},{x:2+Math.cos(a)*23,y:-29+Math.sin(a)*13},'#27834e',5)}ellipse(2,-30,4,4,'#a7d64d');ctx.restore()}
+function drawObject(x,y,o){ctx.save();let g=o.ghost;ctx.globalAlpha=g?.65:1;ellipse(x,y+7,17,7,'#80623c55');
+let icon=o.icon;
+if(icon==='🌴'){drawPalm(x,y,.9)}
+else if(icon==='🌺'||icon==='🌿'||icon==='🌳'){ellipse(x,y-8,12,9,icon==='🌺'?'#f17e9a':icon==='🌿'?'#388b50':'#287b4a');ellipse(x-4,y-10,4,4,'#68b95a')}
+else if(icon==='🏖️'){polygon([{x:x-14,y:y-2},{x,y:y+5},{x:x+14,y:y-2},{x,y:y-9}],'#e4a74e');line({x,y:y-7},{x,y:y-28},'#8d6639',2);for(let i=0;i<8;i++){let a=i*Math.PI/4;line({x,y:y-28},{x:x+Math.cos(a)*14,y:y-28+Math.sin(a)*7},i%2?'#f6a34d':'#f3d64f',5)}}
+else {let h=icon==='🏨'?33:icon==='🏡'?23:icon==='🏊'?8:icon==='🛝'?27:17;polygon([{x:x-17,y:y-5},{x,y:y+4},{x:x+17,y:y-5},{x,y:y-14}], '#c58c4c','#936333');polygon([{x:x-13,y:y-13},{x,y:y-6},{x:x+13,y:y-13},{x,y:y-22}],o.color||'#f5d28a','#986d3a');polygon([{x:x-13,y:y-13},{x,y:y-6},{x,y:y-h},{x:x-13,y:y-h-7}], '#f6e4b6','#b68c4b');polygon([{x,y:y-6},{x:x+13,y:y-13},{x:x+13,y:y-h-7},{x,y:y-h}], '#e9bc75','#a87c40');polygon([{x:x-2,y:y-18},{x:x+2,y:y-16},{x:x+2,y:y-8},{x:x-2,y:y-10}], '#6fc5d0');}
+if(['🍹','🍦','⛲','🗿','🪧','🎡','🛶','🏊','🏄','🛝','🏡','🍹','🏨'].includes(icon)){ctx.font='18px system-ui';ctx.textAlign='center';ctx.fillText(icon,x,y-19)}
+ctx.restore()}
+const pointer={x:0,y:0,active:false};function screenToGrid(px,py){let xx=(px-W/2-camX)/(31*scale), yy=(py-H*.52-camY)/(16*scale);return {x:Math.round((xx+yy)/2),y:Math.round((yy-xx)/2)}}
+function showToast(t){let el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1800)}
+function refresh(){
+ document.getElementById('coins').textContent=Math.floor(coins).toLocaleString('ru-RU');
+ document.getElementById('guests').textContent=guests;
+ document.getElementById('level').textContent=level;
+ const q=quests[Math.min(questStage,quests.length-1)],n=Math.min(q.check(),q.goal);
+ document.getElementById('questTitle').textContent=q.title;
+ document.getElementById('questCount').textContent=n+' / '+q.goal;
+ if(n>=q.goal && questStage<quests.length){questStage++;coins+=q.reward;level++;document.getElementById('questTitle').textContent='🎉 ЗАДАНИЕ ВЫПОЛНЕНО!';document.getElementById('questCount').textContent='+'+q.reward+' 🪙';setTimeout(()=>{refresh();save();showToast('Награда получена: '+q.reward+' монет!')},700)}
+}
+function save(){localStorage.setItem('tropico-save',JSON.stringify({coins,guests,level,placed,questStage,upgrades}))}
+function load(){try{let s=JSON.parse(localStorage.getItem('tropico-save'));if(s){coins=s.coins;guests=s.guests;level=s.level;placed=s.placed||[];questStage=s.questStage||0;upgrades=s.upgrades||0}}catch(e){}refresh()}
+function renderItems(){let box=document.getElementById('items');box.innerHTML='';items[cat].forEach(it=>{let b=document.createElement('button');b.className='item'+(selected===it?' sel':'');b.innerHTML=it[0]+'<small>'+it[1]+'</small><em>'+it[2]+'🪙</em>';b.onclick=()=>{selected=it;renderItems();showToast('Выбрано: '+it[1]+' — коснись пляжа')};box.appendChild(b)})}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{cat=b.dataset.cat;document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x===b));selected=null;renderItems()});
+function placeAt(x,y){if(!selected)return;let [icon,name,cost,rep]=selected;if(coins<cost){showToast('Не хватает монет!');return}if(placed.some(o=>Math.abs(o.x-x)<1&&Math.abs(o.y-y)<1)){showToast('Это место уже занято');return}if(x< -5||x>5||y< -2||y>11){showToast('Выбери место на территории');return}coins-=cost;placed.push({x,y,icon,name,cost,rep,color:colors[placed.length%colors.length]});guests+=Math.max(1,Math.floor(rep/2));if(placed.length%3===0)level++;refresh();save();showToast(name+' построен!');}
+canvas.addEventListener('pointerdown',e=>{pointer.x=e.clientX;pointer.y=e.clientY;pointer.active=true;drag={x:e.clientX,y:e.clientY,cx:camX,cy:camY,moved:false};canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointermove',e=>{pointer.x=e.clientX;pointer.y=e.clientY;if(drag){let dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>10)drag.moved=true;if(drag.moved){camX=drag.cx+dx;camY=drag.cy+dy}}});
+canvas.addEventListener('pointerup',e=>{if(drag&&!drag.moved){let g=screenToGrid(e.clientX,e.clientY);if(selected)placeAt(g.x,g.y);else{let o=placed.find(o=>{let p=iso(o.x,o.y);return Math.hypot(p.x-e.clientX,p.y-e.clientY)<22});if(o){showPanel('Объект: '+o.name,'Можно получать доход с курорта. Улучши его, чтобы увеличить привлекательность.',`<button onclick="upgrade(${placed.indexOf(o)})">⬆ Улучшить за ${Math.floor(o.cost*.7)} 🪙</button>`)}}}drag=null;pointer.active=false});
+window.upgrade=i=>{let o=placed[i];let price=Math.floor(o.cost*.7);if(coins<price){showToast('Не хватает монет');return}coins-=price;o.rep+=2;guests+=2;upgrades++;refresh();save();closePanel();showToast('Объект улучшен!')};
+function showPanel(title,body,extra=''){document.getElementById('panel').innerHTML=`<button class="close" onclick="closePanel()">✕</button><h2>${title}</h2><p>${body}</p>${extra}<button onclick="closePanel()">Закрыть</button>`;document.getElementById('overlay').style.display='flex'}
+function closePanel(){document.getElementById('overlay').style.display='none'}window.closePanel=closePanel;
+document.getElementById('menuBtn').onclick=()=>showPanel('🌴 Тропический рай',`Уровень ${level}. На курорте ${guests} гостей. Построено объектов: ${placed.length}. Задание: ${quests[Math.min(questStage,quests.length-1)].desc}`,'<button onclick="collect()">💰 Собрать доход</button><button onclick="resetGame()">↻ Начать заново</button><button onclick="howto()">❔ Как играть</button>');
+window.collect=()=>{let gain=guests*4+placed.length*12;coins+=gain;refresh();save();closePanel();showToast('Получено '+gain+' монет!')};
+window.resetGame=()=>{if(confirm('Начать заново? Весь прогресс будет сброшен.')){coins=1200;guests=12;level=1;placed=[];questStage=0;upgrades=0;save();refresh();closePanel();showToast('Новый курорт ждёт тебя!')}};
+window.howto=()=>showPanel('Как играть','Выбери вкладку внизу, затем здание или украшение. Коснись свободного места на острове, чтобы построить его. Перетаскивай пальцем карту, чтобы осмотреть курорт. Нажимай на построенные объекты, чтобы улучшать их. Через меню собирай доход. Прогресс сохраняется на этом устройстве.');
+// passive income
+setInterval(()=>{if(placed.length){coins+=Math.max(1,Math.floor(guests*.18));refresh();save()}},5000);
+load();renderItems();draw();
+})();
+</script></body></html>
+<script>if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));</script>
